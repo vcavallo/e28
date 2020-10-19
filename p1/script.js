@@ -1,21 +1,88 @@
-var TestComp = {
+var RoundPlayer = {
+  props: [
+    'secretNumber',
+    'maxGuesses',
+    'maxNumber',
+  ],
   data: function() {
     return {
-      hi: 'world'
+      numbersGuessed: [1]
     }
   },
-  template: "#test-temp" 
+  template: "#round-player",
+  methods: {
+    reset: function() {
+      console.log('reset')
+      // arg 'some message' will pass back to parent
+      this.$emit('reset', 'some message')
+    }
+  }
+}
+
+var RoundHistory = {
+  props: [
+    'number',
+    'playerWon',
+    'guesses',
+    'secretNumber',
+  ],
+  data: function() {
+    return {
+    }
+  },
+  template: "#round-history",
+}
+
+var GameMain = {
+  data: function() {
+    // binary search on 50 numbers = log2(50 - 1) = 5.6
+    // max guesses of 6 would mean player _can_ win every time if they use binary
+    // search on their own. max guesses of 5 biases ever so slightly towards the
+    // computer.
+    // TODO: consider making this a difficulty setting!
+    //       also make maxNumber configurable and could abstract diff to log2(maxNumber - 1)
+    //       and make the settings easy/medium/hard.
+    return {
+      maxGuesses: 5,
+      roundCount: 0,
+      runningScore: 0,
+      currentGuess: 0,
+      rounds: [
+        {
+          number: 1,
+          playerWon: true,
+          guesses: 4,
+          secretNumber: 42,
+        },
+        {
+          number: 2,
+          playerWon: false,
+          guesses: 5,
+          secretNumber: 13,
+        },
+      ],
+    }
+  },
+  template: "#game-main",
+  methods: {
+    parentReset: function(msg) {
+      // msg comes from emit function arg
+      console.log('parent reset with mesg: ', msg)
+    },
+  },
+  components: {
+    'round-history': RoundHistory,
+    'round-player': RoundPlayer,
+  },
 }
 
 var app = new Vue({
   el: '#app',
   data: function() {
-    return {
-      message: 'test',
-    }
+    return {}
   },
   components: {
-    'test-comp': TestComp,
+    'game-main': GameMain,
   },
 })
 

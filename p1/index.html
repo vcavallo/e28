@@ -3,18 +3,15 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-    <title>Hi/Low</title>
+    <title>Vueified Hi/Low</title>
   </head>
 
   <body>
     <header>
       <h1>Hi/Low Game</h1>
       <div id="app">
-        {{ message }}
-        <test-comp>
-        </test-comp>
+        <game-main></game-main>
       </div>
-      <p>The computer is thinking of a whole number between 1 and 50. Try to guess it!<p>
     </header>
 
     <section>
@@ -24,9 +21,56 @@
     </section>
   </body>
 
-  <script type="text/x-template" id="test-temp">
+  <script type="text/x-template" id="game-main">
     <div>
-      hello {{ hi }}
+      <p>The computer is thinking of a whole number between 1 and 50. Try to guess it!</p>
+      <pre>
+        max guesses: {{ maxGuesses }}
+        roundCount: {{ roundCount }}
+        runningScore: {{ runningScore }}
+        currentGuess: {{ currentGuess }}
+      </pre>
+
+      <round-player
+        :secret-number="5"
+        :max-guesses="10"
+        :max-number="50"
+        v-on:reset="parentReset"
+      >
+      </round-player>
+
+      <round-history
+        v-for="round in rounds"
+        :key="round.number"
+        :number="round.number"
+        :playerWon="round.playerWon"
+        :guesses="round.guesses"
+        :secretNumber="round.secretNumber"
+      >
+      </round-history>
+    </div>
+  </script>
+
+  <script type="text/x-template" id="round-history">
+    <div>
+      <pre>
+       round #: {{ number }}
+       player won? {{ playerWon }}
+       guesses: {{ guesses }}
+       secretNumber: {{ secretNumber }}
+      </pre>
+    </div>
+  </script>
+
+  <script type="text/x-template" id="round-player">
+    <div>
+      <pre>
+        maxNumber: {{ maxNumber }}
+        secret number: {{ secretNumber }}
+        max guesses: {{ maxGuesses }}
+        numbersGuessed: {{ numbersGuessed }}
+      </pre>
+      <button @click="reset">Reset</button>
     </div>
   </script>
 
