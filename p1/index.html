@@ -14,16 +14,12 @@
       </div>
     </header>
 
-    <section>
-      <label>Guess <input type="text" name="guess"></label>
-      <div id="buttonContainer"></div>
-      <div class="message"></div>
-    </section>
   </body>
 
   <script type="text/x-template" id="game-main">
     <div>
       <p>The computer is thinking of a whole number between 1 and 50. Try to guess it!</p>
+      <h2>main</h2>
       <pre>
         max guesses: {{ maxGuesses }}
         roundCount: {{ roundCount }}
@@ -31,13 +27,18 @@
         currentGuess: {{ currentGuess }}
       </pre>
 
-      <round-player
-        :secret-number="5"
-        :max-guesses="10"
-        :max-number="50"
-        v-on:reset="parentReset"
-      >
-      </round-player>
+      <div v-if="gameRunning">
+        <round-player
+          :secret-number="5"
+          :max-guesses="maxGuesses"
+          :max-number="maxNumber"
+          v-on:endRound="registerResult"
+        >
+        </round-player>
+      </div>
+      <div v-else>
+        <button @click="setUpRound">Start!</button>
+      </div>
 
       <round-history
         v-for="round in rounds"
@@ -46,6 +47,7 @@
         :playerWon="round.playerWon"
         :guesses="round.guesses"
         :secretNumber="round.secretNumber"
+        :numbersGuessed="round.numbersGuessed"
       >
       </round-history>
     </div>
@@ -53,24 +55,37 @@
 
   <script type="text/x-template" id="round-history">
     <div>
+      <h2>round history</h2>
       <pre>
        round #: {{ number }}
        player won? {{ playerWon }}
        guesses: {{ guesses }}
        secretNumber: {{ secretNumber }}
+       numbersGuessed: {{ numbersGuessed }}
       </pre>
     </div>
   </script>
 
   <script type="text/x-template" id="round-player">
     <div>
+      <h2>round runner</h2>
       <pre>
-        maxNumber: {{ maxNumber }}
         secret number: {{ secretNumber }}
         max guesses: {{ maxGuesses }}
         numbersGuessed: {{ numbersGuessed }}
+        currentGuess: {{ currentGuess }}
+        guessCount: {{ guessCount }}
       </pre>
-      <button @click="reset">Reset</button>
+      <section>
+        <form>
+          <label>Guess
+            <input type="text" name="guess" v-model="currentGuess"></input>
+          </label>
+          <button type="submit" @click.prevent="guess(currentGuess)">
+            Is that it?
+          </button>
+        </form>
+      </section>
     </div>
   </script>
 

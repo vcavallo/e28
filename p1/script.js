@@ -2,20 +2,76 @@ var RoundPlayer = {
   props: [
     'secretNumber',
     'maxGuesses',
-    'maxNumber',
   ],
   data: function() {
     return {
-      numbersGuessed: [1]
+      guessCount: 0,
+      currentGuess: '',
+      numbersGuessed: []
     }
   },
   template: "#round-player",
+  computed: {
+    gameResult: function() {
+      return {
+        numbersGuessed: this.numbersGuessed,
+        guessCount: this.guessCount,
+        secretNumber: this.secretNumber,
+        playerWon: false,
+      }
+    }
+  },
   methods: {
     reset: function() {
-      console.log('reset')
-      // arg 'some message' will pass back to parent
-      this.$emit('reset', 'some message')
-    }
+      this.numbersGuessed = [];
+      this.guessCount = 0;
+      this.currentGuess = '';
+    },
+    guess: function(numberGuessed) {
+      if (this.numbersGuessed.indexOf(numberGuessed) > -1) {
+        // TODO: message
+        console.log('already guessed')
+        this.currentGuess = ''
+        return
+      }
+      this.currentGuess = '';
+      this.guessCount += 1;
+      this.numbersGuessed.push(numberGuessed)
+
+      if (numberGuessed > this.secretNumber) {
+        // TODO: messaging
+        console.log("too high");
+      } else if (numberGuessed < this.secretNumber) {
+        console.log("too low");
+      } else {
+        console.log("you won")
+        this.playerWon()
+      }
+
+      if (this.guessCount >= this.maxGuesses) {
+        console.log('over guesses')
+        this.computerWon()
+      }
+    },
+    playerWon: function() {
+      console.log('player won')
+      const result = this.gameResult;
+      result.playerWon = true;
+
+      this.reportResult(result)
+      this.reset()
+    },
+    computerWon: function() {
+      console.log('computer won')
+      const result = this.gameResult;
+
+      this.reportResult(result)
+      this.reset()
+    },
+
+    reportResult: function(result) {
+      this.$emit('endRound', result)
+    },
   }
 }
 
@@ -25,10 +81,13 @@ var RoundHistory = {
     'playerWon',
     'guesses',
     'secretNumber',
+    'numbersGuessed',
   ],
   data: function() {
     return {
     }
+  },
+  methods: {
   },
   template: "#round-history",
 }
@@ -43,31 +102,45 @@ var GameMain = {
     //       also make maxNumber configurable and could abstract diff to log2(maxNumber - 1)
     //       and make the settings easy/medium/hard.
     return {
+      secretNumber: '',
+      maxNumber: 50,
       maxGuesses: 5,
       roundCount: 0,
       runningScore: 0,
       currentGuess: 0,
-      rounds: [
-        {
-          number: 1,
-          playerWon: true,
-          guesses: 4,
-          secretNumber: 42,
-        },
-        {
-          number: 2,
-          playerWon: false,
-          guesses: 5,
-          secretNumber: 13,
-        },
-      ],
+      gameRunning: false,
+      rounds: [],
     }
   },
   template: "#game-main",
   methods: {
-    parentReset: function(msg) {
+    setUpRound: function() {
+      this.roundCount += 1
+      this.secretNumber = 5
+      this.gameRunning = true
+      // TODO: new game setup to child component
+    },
+    tearDownRound: function() {
+      this.gameRunning = false;
+    },
+    endRound: function(msg) {
       // msg comes from emit function arg
       console.log('parent reset with mesg: ', msg)
+      this.tearDownRound()
+    },
+    registerResult: function(result) {
+      console.table(result);
+      this.endRound()
+      this.rounds.push(
+        {
+          //timestamp: Date.now(),
+          number: this.roundCount,
+          playerWon: result.playerWon,
+          guesses: result.guessCount,
+          secretNumber: result.secretNumber,
+          numbersGuessed: result.numbersGuessed
+        }
+      )
     },
   },
   components: {
@@ -86,91 +159,12 @@ var app = new Vue({
   },
 })
 
-var secretNumber;
-var timer;
-const messageContainer = document.querySelector(".message")
-
-var setupSecret = function() {
-  const min = 1
-  const max = 50
-  secretNumber = Math.floor(Math.random() * (max - min + 1) + min);
-}
-
-var checkGuess = function() {
-  clearMessage();
-  const guess = document.querySelector("input[name='guess']").value;
-
-  if (guess > secretNumber) {
-    messageToUser("too high");
-    timer = window.setTimeout(clearMessage, 2500)
-    return
-  } else if (guess < secretNumber) {
-    messageToUser("too low");
-    timer = window.setTimeout(clearMessage, 2500)
-    return
-  } else if (guess == secretNumber) {
-    setUserWon();
-    return
-  }
-
-  messageToUser("Not sure what to do with that...")
-  return
-}
-
-var messageToUser = function(message = "Not sure") {
-  const messageToUser = document.createTextNode(message)
-  messageContainer.appendChild(messageToUser)
-}
-
-var clearMessage = function() {
-  window.clearTimeout(timer);
-  const message = messageContainer.firstChild;
-  if (message) {
-    messageContainer.removeChild(messageContainer.firstChild);
-  }
-}
-
-var setUserWon = function() {
-  messageToUser("You got it!")
-  removeButtons();
-  showReplayButton();
-}
-
-var setUpGuessButton = function() {
-  const buttonContainer = document.getElementById('buttonContainer');
-  const buttonHtml = '<button id="submitGuess">Is that it?</button>';
-  buttonContainer.insertAdjacentHTML('afterbegin', buttonHtml);
-
-  const guessButton = document.getElementById('submitGuess');
-  guessButton.addEventListener('click', checkGuess);
-}
-
-var showReplayButton = function() {
-  const buttonContainer = document.getElementById('buttonContainer');
-  const buttonHtml = '<button id="replay">Play again!</button>';
-  buttonContainer.insertAdjacentHTML('afterbegin', buttonHtml);
-
-  const replayButton = document.getElementById('replay');
-  replayButton.addEventListener('click', resetGame);
-}
-
-var removeButtons = function() {
-  const buttonContainer = document.getElementById('buttonContainer');
-  while (buttonContainer.firstChild) {
-    buttonContainer.removeChild(buttonContainer.firstChild);
-  }
-}
-
-var clearInput = function() {
-  document.querySelector("input[name='guess']").value = "";
-}
-
-var resetGame = function() {
-  clearInput();
-  removeButtons();
-  clearMessage();
-  setUpGuessButton();
-  setupSecret();
-}
-
-resetGame();
+// var secretNumber;
+// var timer;
+// const messageContainer = document.querySelector(".message")
+// 
+// var setupSecret = function() {
+//   const min = 1
+//   const max = 50
+//   secretNumber = Math.floor(Math.random() * (max - min + 1) + min);
+// }
