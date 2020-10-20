@@ -28,6 +28,8 @@
         level: {{ difficultyModifier }}
       </pre>
 
+      <button @click="resetGame">Reset</button>
+
       <div v-if="!gameRunning">
         <select v-model="difficultyModifier">
           <option v-for="option in difficultySettingOptions" :value="option.modifier">
@@ -81,6 +83,9 @@
   <script type="text/x-template" id="round-player">
     <div>
       <h2>round runner</h2>
+      <div v-if="computedMessage" :class="messageClass">
+        <span>{{ computedMessage }}</span>
+      </div>
       <pre>
         secret number: {{ secretNumber }}
         max guesses: {{ maxGuesses }}
@@ -104,4 +109,16 @@
 
   <script src="./script.js"></script>
 </html>
+
+<style>
+.standard-mesage {
+  color: black;
+}
+.too-high {
+  color: orange;
+}
+.too-low {
+  color: blue;
+}
+</style>
 

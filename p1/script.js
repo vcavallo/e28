@@ -7,7 +7,9 @@ var RoundPlayer = {
     return {
       guessCount: 0,
       currentGuess: '',
-      numbersGuessed: []
+      numbersGuessed: [],
+      currentMessage: '',
+      lastGuessStatus: '',
     }
   },
   template: "#round-player",
@@ -19,18 +21,39 @@ var RoundPlayer = {
         secretNumber: this.secretNumber,
         playerWon: false,
       }
-    }
+    },
+    computedMessage: function() {
+      if (this.currentMessage) {
+        return this.currentMessage
+      }
+      if (!this.currentGuess) {
+        return "Enter a guess"
+      }
+    },
+    messageClass: function() {
+      return {
+        'pending-guess': !this.currentMessage,
+        'too-low': this.lastGuessStatus === 'low',
+        'too-high': this.lastGuessStatus === 'high',
+        'standard-message': (
+          !this.currentMessage ||
+          this.lastGuessStatus === 'duplicate'
+        ),
+      }
+    },
   },
   methods: {
     reset: function() {
       this.numbersGuessed = [];
       this.guessCount = 0;
       this.currentGuess = '';
+      this.lastGuessStatus = '';
+      this.currentMessage = '';
     },
     guess: function(numberGuessed) {
       if (this.numbersGuessed.indexOf(numberGuessed) > -1) {
-        // TODO: message
-        console.log('already guessed')
+        this.currentMessage = `You already guessed ${ numberGuessed }...`
+        this.lastGuessStatus = 'duplicate'
         this.currentGuess = ''
         return
       }
@@ -41,10 +64,13 @@ var RoundPlayer = {
       if (numberGuessed > this.secretNumber) {
         // TODO: messaging
         console.log("too high");
+        this.lastGuessStatus = 'high'
+        this.currentMessage = 'Too high!'
       } else if (numberGuessed < this.secretNumber) {
         console.log("too low");
+        this.lastGuessStatus = 'low'
+        this.currentMessage = 'Too low!'
       } else {
-        console.log("you won")
         this.playerWon()
       }
 
@@ -162,6 +188,12 @@ var GameMain = {
   },
 
   methods: {
+    resetGame: function() {
+      this.tearDownRound()
+      this.roundCount = 0;
+      this.runningScore = 0;
+      this.rounds = [];
+    },
     setUpRound: function() {
       this.roundCount += 1
       this.secretNumber = Math.floor(
@@ -174,13 +206,13 @@ var GameMain = {
       this.gameRunning = false;
     },
     endRound: function(msg) {
-      // msg comes from emit function arg
-      console.log('parent reset with mesg: ', msg)
       this.tearDownRound()
     },
     registerResult: function(result) {
-      console.table(result);
       this.endRound()
+      if (result.playerWon) {
+        this.runningScore += 1;
+      }
       this.rounds.push(
         {
           //timestamp: Date.now(),
