@@ -51,33 +51,59 @@ var RoundPlayer = {
       this.currentMessage = '';
     },
     guess: function(numberGuessed) {
-      if (this.numbersGuessed.indexOf(numberGuessed) > -1) {
+      if (!numberGuessed) {
+        this.currentMessage = `I didn't understand that one`
+        this.currentGuess = ''
+        return;
+      }
+      if (this.numbersGuessed.map((n) => n.number).indexOf(numberGuessed) > -1) {
         this.currentMessage = `You already guessed ${ numberGuessed }...`
         this.lastGuessStatus = 'duplicate'
         this.currentGuess = ''
         return
       }
-      this.currentGuess = '';
+
       this.guessCount += 1;
-      this.numbersGuessed.push(numberGuessed)
 
       if (numberGuessed > this.secretNumber) {
-        // TODO: messaging
-        console.log("too high");
         this.lastGuessStatus = 'high'
         this.currentMessage = 'Too high!'
+        this.numbersGuessed.push(
+          {
+            number: numberGuessed,
+            high: true,
+            low: false,
+            won: false,
+          }
+        )
       } else if (numberGuessed < this.secretNumber) {
-        console.log("too low");
         this.lastGuessStatus = 'low'
         this.currentMessage = 'Too low!'
-      } else {
+        this.numbersGuessed.push(
+          {
+            number: numberGuessed,
+            high: false,
+            low: true,
+            won: false,
+          }
+        )
+      } else if (numberGuessed === this.secretNumber) {
+        this.numbersGuessed.push(
+          {
+            number: numberGuessed,
+            high: false,
+            low: false,
+            won: true,
+          }
+        )
         this.playerWon()
       }
 
       if (this.guessCount >= this.maxGuesses) {
-        console.log('over guesses')
         this.computerWon()
       }
+
+      this.currentGuess = '';
     },
     playerWon: function() {
       console.log('player won')
@@ -113,6 +139,25 @@ var RoundHistory = {
   data: function() {
     return {
     }
+  },
+  computed: {
+    historyClass: function() {
+      return {
+        'win-record': this.playerWon,
+        'loss-record': !this.playerWon,
+      }
+    },
+    summaryMessage: function() {
+      if (this.playerWon) {
+        return `
+        You won after ${ this.guesses } guesses on ${ this.difficulty } difficulty!
+        `
+      } else {
+        return `
+        You failed to guess the secret number after ${ this.guesses } tries on ${ this.difficulty } difficulty.
+        `
+      }
+    },
   },
   methods: {
   },
