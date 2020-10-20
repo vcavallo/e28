@@ -82,6 +82,7 @@ var RoundHistory = {
     'guesses',
     'secretNumber',
     'numbersGuessed',
+    'difficulty',
   ],
   data: function() {
     return {
@@ -94,29 +95,78 @@ var RoundHistory = {
 
 var GameMain = {
   data: function() {
-    // binary search on 50 numbers = log2(50 - 1) = 5.6
-    // max guesses of 6 would mean player _can_ win every time if they use binary
-    // search on their own. max guesses of 5 biases ever so slightly towards the
-    // computer.
-    // TODO: consider making this a difficulty setting!
-    //       also make maxNumber configurable and could abstract diff to log2(maxNumber - 1)
-    //       and make the settings easy/medium/hard.
     return {
       secretNumber: '',
-      maxNumber: 50,
-      maxGuesses: 5,
       roundCount: 0,
       runningScore: 0,
       currentGuess: 0,
       gameRunning: false,
       rounds: [],
+      difficultySettingOptions: [
+        { name: 'Easy', modifier: 0 },
+        { name: 'Medium', modifier: 10 },
+        { name: 'Hard', modifier: 20 },
+        { name: 'Bonkers', modifier: 25 },
+      ],
+      difficultyModifier: 10,
     }
   },
   template: "#game-main",
+  computed: {
+    difficultyDisplay: function() {
+      const difficultyModifier = this.difficultyModifier;
+      const option = this.difficultySettingOptions.find(
+        function(opt) {
+          if (opt.modifier == difficultyModifier) {
+            return opt
+          }
+      })
+      if (option) {
+        return option.name
+      } else {
+        return "Unknown"
+      }
+    },
+
+    maxGuesses: function() {
+      // binary search on 50 numbers = log2(50 - 1) = 5.6
+      // A value of 6 would mean the player can _always_ win if they use binary search.
+      // A lower number would mean they'll need some luck. We'll use this binary search
+      // standard as our base for the number of guesses the player gets.
+
+      // We'll use the difficulty level as an additional modifier, removing some percent
+      // of guesses from the maxNumber. In this way, the maxNumber could potentially
+      // be made into another flexible game option (rather than hard-coded as below)
+
+      const baseGuesses =  Math.ceil(Math.log2(this.maxNumber - 1));
+      const percentPenalty = (this.difficultyModifier / 100);
+      const penalty =  Math.ceil(baseGuesses * percentPenalty);
+
+      return baseGuesses - penalty
+    },
+
+    maxNumber: function() {
+      switch (this.difficultyModifier) {
+        case (this.difficultySettingOptions[0].modifier):
+          return 100
+        case (this.difficultySettingOptions[1].modifier):
+          return 500
+        case (this.difficultySettingOptions[2].modifier):
+          return 1000
+        case (this.difficultySettingOptions[3].modifier):
+          return 10000
+        default:
+          return 100
+      }
+    },
+  },
+
   methods: {
     setUpRound: function() {
       this.roundCount += 1
-      this.secretNumber = 5
+      this.secretNumber = Math.floor(
+        Math.random() * (this.maxNumber) + 1
+      );
       this.gameRunning = true
       // TODO: new game setup to child component
     },
@@ -138,7 +188,8 @@ var GameMain = {
           playerWon: result.playerWon,
           guesses: result.guessCount,
           secretNumber: result.secretNumber,
-          numbersGuessed: result.numbersGuessed
+          numbersGuessed: result.numbersGuessed,
+          difficulty: this.difficultyDisplay,
         }
       )
     },
@@ -158,13 +209,3 @@ var app = new Vue({
     'game-main': GameMain,
   },
 })
-
-// var secretNumber;
-// var timer;
-// const messageContainer = document.querySelector(".message")
-// 
-// var setupSecret = function() {
-//   const min = 1
-//   const max = 50
-//   secretNumber = Math.floor(Math.random() * (max - min + 1) + min);
-// }

@@ -18,18 +18,28 @@
 
   <script type="text/x-template" id="game-main">
     <div>
-      <p>The computer is thinking of a whole number between 1 and 50. Try to guess it!</p>
+      <p>The computer is thinking of a whole number between 1 and {{ maxNumber }}. Try to guess it!</p>
       <h2>main</h2>
       <pre>
         max guesses: {{ maxGuesses }}
         roundCount: {{ roundCount }}
         runningScore: {{ runningScore }}
         currentGuess: {{ currentGuess }}
+        level: {{ difficultyModifier }}
       </pre>
+
+      <div v-if="!gameRunning">
+        <select v-model="difficultyModifier">
+          <option v-for="option in difficultySettingOptions" :value="option.modifier">
+            {{ option.name }}
+          </option>
+        </select>
+        Difficulty: {{ difficultyDisplay }}
+      </div>
 
       <div v-if="gameRunning">
         <round-player
-          :secret-number="5"
+          :secret-number="secretNumber"
           :max-guesses="maxGuesses"
           :max-number="maxNumber"
           v-on:endRound="registerResult"
@@ -48,6 +58,7 @@
         :guesses="round.guesses"
         :secretNumber="round.secretNumber"
         :numbersGuessed="round.numbersGuessed"
+        :difficulty="round.difficulty"
       >
       </round-history>
     </div>
@@ -62,6 +73,7 @@
        guesses: {{ guesses }}
        secretNumber: {{ secretNumber }}
        numbersGuessed: {{ numbersGuessed }}
+       difficulty: {{ difficulty }}
       </pre>
     </div>
   </script>
@@ -76,6 +88,7 @@
         currentGuess: {{ currentGuess }}
         guessCount: {{ guessCount }}
       </pre>
+      <p>You have {{ maxGuesses - guessCount }} chance{{ (maxGuesses - guessCount === 1) ? `` : `s` }}</p>
       <section>
         <form>
           <label>Guess
