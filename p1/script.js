@@ -64,6 +64,7 @@ var RoundPlayer = {
       }
 
       this.guessCount += 1;
+      this.currentGuess = '';
 
       if (numberGuessed > this.secretNumber) {
         this.lastGuessStatus = 'high'
@@ -76,6 +77,7 @@ var RoundPlayer = {
             won: false,
           }
         )
+        return
       } else if (numberGuessed < this.secretNumber) {
         this.lastGuessStatus = 'low'
         this.currentMessage = 'Too low!'
@@ -87,7 +89,8 @@ var RoundPlayer = {
             won: false,
           }
         )
-      } else if (numberGuessed === this.secretNumber) {
+        return
+      } else if (numberGuessed == this.secretNumber) {
         this.numbersGuessed.push(
           {
             number: numberGuessed,
@@ -97,13 +100,14 @@ var RoundPlayer = {
           }
         )
         this.playerWon()
+        return
       }
 
       if (this.guessCount >= this.maxGuesses) {
         this.computerWon()
+        return;
       }
 
-      this.currentGuess = '';
     },
     playerWon: function() {
       console.log('player won')
