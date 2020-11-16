@@ -1,0 +1,216 @@
+ver=1.0.2
+
+# To set permissions for the API we need to know what user 
+# the server is running Apache under.
+# On DigitalOcean, this user is `www-data`.
+# If you're using a different server, run the following command to find out your Apache user:
+# $ ps -ef | grep apache
+# From the results, look at the left-most column corresponding to the Apache server
+# Change the following variable to that user
+productionApacheUser="www-data"
+
+
+
+#
+# Output
+#
+dump () {
+    echo ""
+    echo "===> $1"
+}
+
+
+
+#
+# Detect system
+#
+dump "Detecting system"
+
+# Confirm we're running this script from within the e28-api directory
+if [[ ! $(pwd) =~ "e28-api" || $(pwd) =~ "core" ]]
+then
+   echo "This script must be run from within the e28-api directory."
+   echo "Current directory: $(pwd)"
+   exit;
+fi
+
+apiDir=$(pwd)/
+coreDir=$apiDir"core/"
+publicDir=$coreDir"public/"
+
+# Determine what system we're on (local or production) based on whether the `productionApacheUser` exists 
+if [ -f "/etc/passwd" ]; then
+    productionApacheUserExists=$(grep -c "^$productionApacheUser:" /etc/passwd)
+else 
+    productionApacheUserExists=0
+fi
+
+# PRODUCTION
+if [ "$productionApacheUserExists" = "1" ]; then
+    server="production"
+    phpExecutable=$(which php)
+# LOCAL
+else
+    server="local"
+    # Windows
+    if [ -d "c:\xampp\php" ]; then
+        system='windows'
+        phpExecutable="c:\xampp\php\php.exe"
+        # Replace the staring "/c/" with "c:/"
+        apiDir=${apiDir/\/c\//c:\/}
+        # Replace all forward slashes with backwards slashes
+        apiDir=${apiDir//\//\\}
+        coreDir=$apiDir"core\\"
+        publicDir=$coreDir"public\\"
+    # Mac
+    elif [ -d "/Applications/XAMPP/xamppfiles/bin" ]; then
+        system='mac'
+        phpExecutable="/Applications/XAMPP/xamppfiles/bin/php"
+    # Other
+    else 
+        system='other'
+        phpExecutable=$(which php)
+    fi
+fi
+
+
+echo "* Setup script version: $ver"
+echo "* Server: $server"
+if [ $server == 'production' ]; then
+    echo "* Apache user: $productionApacheUser"
+fi
+
+echo "* PHP executable: $phpExecutable"
+echo "* API directory: $apiDir"
+echo "* Core directory: $coreDir"
+echo "* Public directory: $publicDir"
+
+
+
+#
+# Update core
+#
+dump "Updating e28-api-core"
+
+# Make core directory if it doesn't exist
+mkdir -p core
+
+# All other commands should be run in core/
+cd core
+
+# Update e28-api-core if it already exists (`app` directory present)
+if [ -d "app" ]; then
+   git pull
+# Clone e28-api-core if it does not yet exist
+else
+    git clone git@github.com:susanBuck/e28-api-core.git .
+fi
+
+
+#
+# Packages
+#
+if [ $server == 'production' ]; then
+
+    # If we have sqlite3, we can assume server prep has already been completed - skip
+    if php -m | grep sqlite3 >/dev/null; then
+        dump "Server already prepped to run Laravel application"
+    else
+        dump "Prepping server to run Laravel application"
+
+        echo "Adding modules"
+        sudo add-apt-repository ppa:ondrej/php
+        sudo apt-get update
+        sudo apt-get install php7.4-mbstring zip unzip php7.4-xml php-sqlite3
+
+        echo "Enabling modrewrite"
+        # Laravel requires Apache's `mod_rewrite` for URL routing, so we enable it:
+        sudo a2enmod rewrite
+
+        echo "Restarting Apache"
+        service apache2 restart
+    fi
+fi
+
+
+#
+# Database
+#
+dump "Setting up database"
+touch database/database.sqlite
+echo "Created /core/database/database.sqlite"
+
+# Do initial migration (so sessions and other fundamental tables exist, allowing artisan scripts to run w/o error)
+$phpExecutable artisan migrate --force --quiet
+
+#
+# Laravel initial setup
+#
+if [ ! -f ".env" ]; then
+    dump "Laravel initial setup"
+
+    if [ $server == 'production' ]; then
+        echo "Production: Setting $productionApacheUser as owner of directories that Apache needs write access to"
+        sudo chown -R ${productionApacheUser} "${coreDir}database"
+        sudo chown -R ${productionApacheUser} "${coreDir}storage"
+        sudo chown -R ${productionApacheUser} "${coreDir}bootstrap/cache"
+        sudo chown -R ${productionApacheUser} "${coreDir}database/migrations/"
+        sudo chown -R ${productionApacheUser} "${coreDir}database/factories/GeneratedModels"
+        sudo chown -R ${productionApacheUser} "${coreDir}app/Models/GeneratedModels/"
+        sudo chown -R ${productionApacheUser} "${coreDir}app/Http/Controllers/GeneratedControllers/"
+        sudo chown -R ${productionApacheUser} "${coreDir}app/Http/Requests/GeneratedRequests/"
+        sudo chown -R ${productionApacheUser} "${coreDir}database/factories/GeneratedModels"
+        sudo chown -R ${productionApacheUser} "${coreDir}routes"
+    elif [ $system != 'windows' ]; then
+        # Note: File mode changes aren't necessary on Windows because XAMPP is running with the necessary
+        # permissions to write to the following directories. 
+        echo "Local: Setting write permissions on directories that Apache needs write access to"
+        chmod -R 777 "${coreDir}database"
+        chmod -R 777 "${coreDir}storage"
+        chmod -R 777 "${coreDir}bootstrap/cache"
+        chmod -R 777 "${coreDir}database/migrations/"
+        chmod -R 777 "${coreDir}database/factories/GeneratedModels"
+        chmod -R 777 "${coreDir}app/Models/GeneratedModels/"
+        chmod -R 777 "${coreDir}app/Http/Controllers/GeneratedControllers/"
+        chmod -R 777 "${coreDir}app/Http/Requests/GeneratedRequests/"
+        chmod -R 777 "${coreDir}database/factories/GeneratedModels"
+        chmod -R 777 "${coreDir}routes"
+    fi
+
+    echo "Creating environment file (.env)"
+    cp .env.example .env
+    
+    echo "Generating app key"
+    $phpExecutable artisan key:generate
+fi
+
+
+#
+# Virtual Host
+#
+if [ $server == 'production' ]; then
+    url="e28-api.yourdomain.com"
+else
+    url="e28-api.loc"
+fi
+
+dump "Expected Virtual Host:"
+echo "
+<VirtualHost *:80>
+    ServerName $url
+    DocumentRoot $publicDir
+    <Directory $publicDir>
+        AllowOverride All
+        Options -Indexes
+        Require all granted
+    </Directory>
+</VirtualHost>
+"
+
+
+#
+# Build API
+#
+dump "Build API"
+
+$phpExecutable artisan e28-api:setup
