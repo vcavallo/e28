@@ -1,5 +1,5 @@
 <template>
-  <div class="hello">
+  <div>
     <ul>
       <li v-for="l in lists" :key="l.id">
         <router-link :to="{ name: 'listShow', params: { listID: l.id } }">{{ l.name }}</router-link>

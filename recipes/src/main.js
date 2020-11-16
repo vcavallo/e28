@@ -5,6 +5,7 @@ import VueRouter from 'vue-router';
 import Home from '@/components/Home.vue';
 import RecipeIndex from '@/components/RecipeIndex.vue';
 import RecipeShow from '@/components/RecipeShow.vue';
+import RecipeNew from '@/components/RecipeNew.vue';
 import ListIndex from '@/components/ListIndex.vue';
 import ListShow from '@/components/ListShow.vue';
 
@@ -28,6 +29,9 @@ const router = new VueRouter({
     },
     {
       path: '/recipes/:recipeID', component: RecipeShow, props: true, name: 'recipeShow'
+    },
+    {
+      path: '/recipes/new', component: RecipeNew, name: 'recipeNew'
     },
   ],
   mode: 'history'

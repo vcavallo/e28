@@ -5,6 +5,7 @@
         <router-link :to="{ name: 'recipeShow', params: { recipeID: r.id } }">{{ r.name }}</router-link>
       </li>
     </ul>
+    <router-link :to="{ name: 'recipeNew' }">Add Recipe</router-link>
   </div>
 </template>
 
