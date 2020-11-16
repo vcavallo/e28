@@ -1,24 +1,5 @@
 # recipes
 
-## Project setup
-```
-yarn install
-```
+Known Problems:
 
-### Compiles and hot-reloads for development
-```
-yarn serve
-```
-
-### Compiles and minifies for production
-```
-yarn build
-```
-
-### Lints and fixes files
-```
-yarn lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+- n+1 issue on shopping list view. would be solved by a join on the shopping list items with recipe components

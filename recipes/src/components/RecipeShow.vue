@@ -4,6 +4,7 @@
 
     <ul>
       <div v-for="c in components" :key="c.id">
+        <AddToListWidget :componentID="c.id" />
         <RecipeComponent
           :name="c.name"
           :quantity="c.quantity"
@@ -21,6 +22,7 @@
 <script>
 import { axios } from "@/api.js";
 import RecipeComponent from "@/components/RecipeComponent.vue"
+import AddToListWidget from "@/components/AddToListWidget.vue"
 
 export default {
   props: ["recipeID"],
@@ -57,7 +59,8 @@ export default {
     },
   },
   components: {
-    RecipeComponent
+    RecipeComponent,
+    AddToListWidget
   },
 };
 </script>
