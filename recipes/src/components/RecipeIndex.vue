@@ -1,14 +1,34 @@
 <template>
   <div class="hello">
-    Index
-    <router-link :to="{ name: 'recipeShow', params: { recipeID: 5 } }" >Recipe 5</router-link>
+    <ul>
+      <li v-for="r in recipes" :key="r.id">
+        <router-link :to="{ name: 'recipeShow', params: { recipeID: r.id } }">{{ r.name }}</router-link>
+      </li>
+    </ul>
   </div>
 </template>
 
 <script>
+import { axios } from '@/api.js'
+
 export default {
   props: {
-  }
+  },
+  data() {
+    return {
+      recipes: []
+    }
+  },
+  created() {
+    this.getAllRecipes()
+  },
+  methods: {
+    getAllRecipes() {
+      axios.get('recipe').then((res) => {
+        this.recipes = res.data.recipe;
+      })
+    },
+  },
 }
 </script>
 

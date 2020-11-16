@@ -1,8 +1,17 @@
 <template>
   <div id="app">
     <div>
-      <router-link :to="{ name: 'home' }" >Home</router-link>
-      <router-link :to="{ name: 'recipeIndex' }" >Index</router-link>
+      <div style="display: inline-block; margin-right: 10px">
+        <router-link :to="{ name: 'home' }">Home</router-link>
+      </div>
+
+      <div style="display: inline-block; margin-right: 10px">
+        <router-link :to="{ name: 'recipeIndex' }">Index</router-link>
+      </div>
+
+      <div style="display: inline-block">
+        <router-link :to="{ name: 'listIndex' }">Shopping Lists</router-link>
+      </div>
     </div>
     <router-view />
   </div>
@@ -10,10 +19,9 @@
 
 <script>
 export default {
-  name: 'App',
-  components: {
-  }
-}
+  name: "App",
+  components: {},
+};
 </script>
 
 <style>
