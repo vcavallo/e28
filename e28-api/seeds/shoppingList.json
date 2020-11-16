@@ -1,0 +1,12 @@
+{
+  "seeds": [
+    {
+      "name": "Breakfast Things",
+      "description": "These are things I need for the morning"
+    },
+    {
+      "name": "Lunch Things",
+      "description": "For lunch"
+    }
+  ]
+}

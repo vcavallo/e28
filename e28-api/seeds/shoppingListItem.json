@@ -1,0 +1,12 @@
+{
+  "seeds": [
+    {
+      "shopping_list_id": 1,
+      "recipe_component_id": 3
+    },
+    {
+      "shopping_list_id": 1,
+      "recipe_component_id": 2
+    }
+  ]
+}
