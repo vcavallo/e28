@@ -137,7 +137,7 @@ fi
 # Database
 #
 dump "Setting up database"
-touch database/database.sqlite
+sudo touch database/database.sqlite
 echo "Created /core/database/database.sqlite"
 
 # Do initial migration (so sessions and other fundamental tables exist, allowing artisan scripts to run w/o error)
