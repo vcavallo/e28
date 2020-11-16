@@ -1,0 +1,34 @@
+{
+  "seeds": [
+    {
+      "name": "Egg",
+      "quantity": 1.0,
+      "unit": "",
+      "recipe_id": 1
+    },
+    {
+      "name": "Water",
+      "quantity": 8.5,
+      "unit": "Ounces",
+      "recipe_id": 1
+    },
+    {
+      "name": "Peanute Butter",
+      "quantity": 2.5,
+      "unit": "Tablespoons",
+      "recipe_id": 2
+    },
+    {
+      "name": "Jelly",
+      "quantity": 3.25,
+      "unit": "Teaspons",
+      "recipe_id": 2
+    },
+    {
+      "name": "Bread",
+      "quantity": 2.0,
+      "unit": "Slices",
+      "recipe_id": 2
+    }
+  ]
+}

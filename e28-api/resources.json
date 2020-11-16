@@ -1,5 +1,37 @@
 {
-    "product": {
+  "recipeComponent": {
+    "recipe_id": {
+      "type": "integer",
+      "validators": [
+        "required",
+        "numeric"
+      ]
+    },
+    "name": {
+      "type": "string",
+      "validators": [
+        "required",
+        "min:2",
+        "max:100"
+      ]
+    },
+    "quantity": {
+      "type": "float",
+      "validators": [
+        "required",
+        "numeric"
+      ]
+    },
+    "unit": {
+      "type": "string",
+      "validators": []
+    },
+    "unit_plural": {
+      "type": "string",
+      "validators": []
+    }
+  },
+    "recipe": {
         "name": {
             "type": "string",
             "validators": [
@@ -8,57 +40,20 @@
                 "max:100"
             ]
         },
-        "sku": {
-            "type": "string",
-            "validators": [
-                "required",
-                "min:3",
-                "max:100",
-                "unique",
-                "alpha_dash"
-            ]
-        },
-        "description": {
+        "instructions": {
             "type": "text",
             "validators": [
                 "required",
-                "min:100"
+                "min:1"
             ]
         },
-        "price": {
-            "type": "integer",
-            "validators": [
-                "required",
-                "numeric"
-            ]
-        },
-        "available": {
-            "type": "integer",
-            "validators": [
-                "required",
-                "numeric"
-            ]
-        },
-        "weight": {
-            "type": "integer",
-            "validators": [
-                "required",
-                "numeric"
-            ]
-        },
-        "perishable": {
+        "recommended": {
             "type": "boolean",
-            "validators": [
-                "required"
-            ]
-        },
-        "categories": {
-            "type": "string",
-            "validators": []
+            "validators": [ "boolean" ]
         }
     },
     "favorite": {
-        "product_id": {
+        "recipe_id": {
             "type": "integer",
             "validators": [
                 "required",

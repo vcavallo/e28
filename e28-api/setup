@@ -213,4 +213,4 @@ echo "
 #
 dump "Build API"
 
-$phpExecutable artisan e28-api:setup
+sudo $phpExecutable artisan e28-api:setup

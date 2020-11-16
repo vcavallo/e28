@@ -1,0 +1,13 @@
+{
+    "seeds": [
+        {
+            "name": "Hardboiled Egg",
+            "instructions": "Put the egg in the water and heat it."
+        },
+        {
+            "name": "PB&J",
+            "instructions": "Peanut butte on bread do it.",
+            "recommended": true
+        }
+    ]
+}
