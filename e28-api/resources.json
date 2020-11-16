@@ -1,4 +1,41 @@
 {
+  "shoppingListItem": {
+    "shopping_list_id": {
+      "type": "integer",
+      "validators": [
+        "required",
+        "numeric"
+      ]
+    },
+    "recipe_component_id": {
+      "type": "integer",
+      "validators": [
+        "required",
+        "numeric"
+      ]
+    },
+    "acquired": {
+      "type": "boolean",
+      "validators": [ "boolean" ]
+    }
+  },
+  "shoppingList": {
+    "name": {
+      "type": "string",
+      "validators": [
+        "required",
+        "min:2",
+        "max:100"
+      ]
+    },
+    "description": {
+      "type": "text",
+      "validators": [
+        "required",
+        "min:1"
+      ]
+    }
+  },
   "recipeComponent": {
     "recipe_id": {
       "type": "integer",
