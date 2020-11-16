@@ -11,6 +11,29 @@
           :unit="c.unit"
         />
       </div>
+      <div style="border: 1px solid black; padding: 10px; margin: 5px 0; display: inline-block">
+        <form>
+          <div>
+            <label for="componentName">
+              New ingredient name
+              <input placeholder="Olive Oil" type="text" id="componentName" v-model="newComponentName">
+            </label>
+          </div>
+          <div>
+            <label for="componentQty">
+              Quantity
+              <input placeholder="1.5" type="text" id="componentQty" v-model="newComponentQty">
+            </label>
+          </div>
+          <div>
+            <label for="componentUnit">
+              Unit
+              <input placeholder="Tbs" type="text" id="componentUnit" v-model="newComponentUnit">
+            </label>
+          </div>
+          <button :disabled="adding" type="submit" @click.prevent="addComponent">Add</button>
+        </form>
+      </div>
     </ul>
 
     <p>
@@ -33,6 +56,10 @@ export default {
     return {
       recipe: {},
       components: [],
+      newComponentName: '',
+      newComponentQty: null,
+      newComponentUnit: '',
+      adding: false,
     };
   },
   watch: {
@@ -57,6 +84,27 @@ export default {
         this.components = res.data.results;
       });
     },
+    addComponent() {
+      this.adding = true
+      axios.post('recipeComponent', {
+        name: this.newComponentName,
+        recipe_id: this.recipeID,
+        quantity: this.newComponentQty,
+        unit: this.newComponentUnit,
+      })
+      .then((res) => {
+        if (res.data.success) {
+          const newComponent = res.data.recipeComponent
+          this.components.push(newComponent)
+        }
+      })
+      .finally(() => {
+        this.newComponentName = ''
+        this.newComponentQty = null
+        this.newComponentUnit = ''
+        this.adding = false
+      })
+    }
   },
   components: {
     RecipeComponent,
