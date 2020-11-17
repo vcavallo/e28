@@ -1,5 +1,3 @@
-# recipes
-
 # Project 2
 + By: Vinney Cavallo
 + Production URL: <http://recipes.vinney.xyz>
