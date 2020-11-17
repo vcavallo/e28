@@ -75,6 +75,8 @@ The 'View/Page' components have been covered above, so I'll only detail the non-
 
 ## Notes for instructor
 
+**I originally had worked on this entire project in a `/recipes` directory of this repo. After reviewing the submission guidelines, I copied it all to `/p2` and the application is also available at <http://p2.vinney.xyz>. I made this change just before submission and was unsure if I copied it correctly, so if there are any issues, please consider the `/recipes` project the correct one. I only created this `p2` copy to comply with the letter of the guidelines :)**
+
 I've added only the minimal styling necessary to use the UI properly.
 
 In a few places, I've included "loading" states while API calls are pending in order to demonstrate understanding of that concept. I didn't use this pattern on _all_ elements which could use it (for instance, the recipe index) - but only where it would prevent confusing UX; like after marking a shopping list item 'acquired'. Without a loading state here the user may think they 'missed' the click target and could accidentally toggle the state multiple times without realizing.  
