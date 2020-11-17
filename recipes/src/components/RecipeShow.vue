@@ -1,6 +1,9 @@
 <template>
   <div>
-    <h1>{{ recipe.name }}</h1>
+    <h1>
+      {{ recipe.name }}
+      <span v-if="recipe.recommended" style="margin-left: 4px;"><i class="fas fa-star"></i></span>
+    </h1>
 
     <ul>
       <div v-for="c in components" :key="c.id">

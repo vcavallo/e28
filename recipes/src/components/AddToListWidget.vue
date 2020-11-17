@@ -1,6 +1,6 @@
 <template>
   <div style="display: inline-block">
-    <i @click="getLists" class="fas fa-list" style="padding: 3px"></i>
+    <i @click="getLists" class="fas" :class="toggledIcon" style="padding: 3px"></i>
     <div v-if="open">
       <div class="lists-container">
         <div v-if="gettingLists">...Finding shopping lists</div>
@@ -44,9 +44,19 @@ export default {
   computed: {
     unusedLists() {
       // TODO: only show lists that don't contain this item?
-      //       Or maybe it's fine to add multiple times
       return this.lists;
+
+      // get all shopping_list_items
+      // only return the ones that have this recipe_component_id present
+      // without more robust database joins and/or Vuex, this will be too costly.
     },
+    toggledIcon() {
+      if (!this.open) {
+        return 'fa-list'
+      } else {
+        return 'fa-times-circle'
+      }
+    }
   },
   methods: {
     getLists() {
@@ -89,4 +99,5 @@ export default {
   box-shadow: 2px 2px 2px black;
   padding: 8px;
 }
+
 </style>

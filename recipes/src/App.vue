@@ -6,7 +6,7 @@
       </div>
 
       <div style="display: inline-block; margin-right: 10px">
-        <router-link :to="{ name: 'recipeIndex' }">Index</router-link>
+        <router-link :to="{ name: 'recipeIndex' }">All Recipes</router-link>
       </div>
 
       <div style="display: inline-block">

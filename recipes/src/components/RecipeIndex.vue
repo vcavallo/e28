@@ -1,8 +1,9 @@
 <template>
-  <div class="hello">
+  <div>
     <ul>
       <li v-for="r in recipes" :key="r.id">
         <router-link :to="{ name: 'recipeShow', params: { recipeID: r.id } }">{{ r.name }}</router-link>
+        <span v-if="r.recommended" style="margin-left: 4px;"><i class="fas fa-star"></i></span>
       </li>
     </ul>
     <router-link :to="{ name: 'recipeNew' }">Add Recipe</router-link>
