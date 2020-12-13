@@ -1,4 +1,4 @@
-ver=1.0.2
+ver=1.0.4
 
 # To set permissions for the API we need to know what user 
 # the server is running Apache under.
@@ -100,10 +100,12 @@ cd core
 
 # Update e28-api-core if it already exists (`app` directory present)
 if [ -d "app" ]; then
-   git pull
+    # Toggle filemode tracking to `false` in case it was initially cloned without this setting
+    git config --replace-all core.filemode false 
+    git pull
 # Clone e28-api-core if it does not yet exist
 else
-    git clone git@github.com:susanBuck/e28-api-core.git .
+    git clone --config core.filemode=false git@github.com:susanBuck/e28-api-core.git .
 fi
 
 
@@ -128,7 +130,7 @@ if [ $server == 'production' ]; then
         sudo a2enmod rewrite
 
         echo "Restarting Apache"
-        service apache2 restart
+        sudo service apache2 restart
     fi
 fi
 
@@ -137,11 +139,13 @@ fi
 # Database
 #
 dump "Setting up database"
-sudo touch database/database.sqlite
+sudo touch database/database.sqlite #sudo?
 echo "Created /core/database/database.sqlite"
 
+dump "Doing initial migrate"
 # Do initial migration (so sessions and other fundamental tables exist, allowing artisan scripts to run w/o error)
-$phpExecutable artisan migrate --force --quiet
+dump "$phpExecutable"
+sudo $phpExecutable artisan migrate --force --quiet
 
 #
 # Laravel initial setup
@@ -181,7 +185,7 @@ if [ ! -f ".env" ]; then
     cp .env.example .env
     
     echo "Generating app key"
-    $phpExecutable artisan key:generate
+    sudo $phpExecutable artisan key:generate
 fi
 
 
