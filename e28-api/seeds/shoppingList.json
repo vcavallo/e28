@@ -2,11 +2,18 @@
   "seeds": [
     {
       "name": "Breakfast Things",
-      "description": "Some things I need to buy for breakfast tomorrow."
+      "description": "Some things I need to buy for breakfast tomorrow.",
+      "user_id": 1
+    },
+    {
+      "name": "Extra stuff",
+      "description": "More things, for testing",
+      "user_id": 1
     },
     {
       "name": "Lunch Things",
-      "description": "This list is for lunch recipes."
+      "description": "This list is for lunch recipes.",
+      "user_id": 2
     }
   ]
 }
