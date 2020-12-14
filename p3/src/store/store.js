@@ -25,7 +25,8 @@ export default new Vuex.Store({
     authUser(context) {
       axios.post('auth').then((response) => {
         if (response.data.authenticated) {
-          context.commit('setUser', response.data.user)
+          const user = response.data.user
+          context.commit('setUser', user)
         }
       })
     }

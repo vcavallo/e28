@@ -13,11 +13,19 @@
         <router-link :to="{ name: 'listIndex' }">Shopping Lists</router-link>
       </div>
 
-      <div v-if="user" style="display: inline-block">
-        <router-link :to="{ name: 'account' }">My Account</router-link>
+      <div v-if="user" style="display: inline-block;">
+        <div style="display: inline-block">
+          <router-link :to="{ name: 'account' }">My Account</router-link>
+        </div>
       </div>
-      <div v-else style="display: inline-block">
-        <router-link :to="{ name: 'signup' }">Sign Up</router-link>
+      <div v-else style="display: inline-block;">
+        <div style="display: inline-block; margin-right: 10px">
+          <router-link :to="{ name: 'account' }">Sign In</router-link>
+        </div>
+
+        <div style="display: inline-block">
+          <router-link :to="{ name: 'signup' }">Sign Up</router-link>
+        </div>
       </div>
 
     </div>
