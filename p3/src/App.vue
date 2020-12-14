@@ -9,9 +9,17 @@
         <router-link :to="{ name: 'recipeIndex' }">All Recipes</router-link>
       </div>
 
-      <div style="display: inline-block">
+      <div style="display: inline-block; margin-right: 10px">
         <router-link :to="{ name: 'listIndex' }">Shopping Lists</router-link>
       </div>
+
+      <div v-if="user" style="display: inline-block">
+        <router-link :to="{ name: 'account' }">My Account</router-link>
+      </div>
+      <div v-else style="display: inline-block">
+        <router-link :to="{ name: 'signup' }">Sign Up</router-link>
+      </div>
+
     </div>
     <router-view />
   </div>
@@ -20,7 +28,14 @@
 <script>
 export default {
   name: "App",
-  components: {},
+  computed: {
+    user() {
+      return this.$store.state.auth.user
+    }
+  },
+  mounted() {   
+    this.$store.dispatch('authUser');
+  }
 };
 </script>
 
