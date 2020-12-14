@@ -6,7 +6,7 @@
         <span v-if="r.recommended" style="margin-left: 4px;"><i class="fas fa-star"></i></span>
       </li>
     </ul>
-    <router-link :to="{ name: 'recipeNew' }">Add Recipe</router-link>
+    <router-link v-if="user" :to="{ name: 'recipeNew' }">Add Recipe</router-link>
   </div>
 </template>
 
@@ -19,6 +19,11 @@ export default {
   data() {
     return {
       recipes: []
+    }
+  },
+  computed: {
+    user() {
+      return this.$store.state.auth.user
     }
   },
   created() {

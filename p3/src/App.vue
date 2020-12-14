@@ -9,7 +9,7 @@
         <router-link :to="{ name: 'recipeIndex' }">All Recipes</router-link>
       </div>
 
-      <div style="display: inline-block; margin-right: 10px">
+      <div v-if="user" style="display: inline-block; margin-right: 10px">
         <router-link :to="{ name: 'listIndex' }">Shopping Lists</router-link>
       </div>
 

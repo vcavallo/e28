@@ -38,6 +38,16 @@ export default {
         this.setUpList(val);
       }
     },
+    user(val) {
+      if (val) {
+        this.setUpList(this.listID)
+      }
+    },
+  },
+  computed: {
+    user() {
+      return this.$store.state.auth.user
+    }
   },
   methods: {
     setUpList(sID) {

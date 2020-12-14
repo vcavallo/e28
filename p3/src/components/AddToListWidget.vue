@@ -5,7 +5,7 @@
       <div class="lists-container">
         <div v-if="gettingLists">...Finding shopping lists</div>
         <div v-else>
-          <div v-if="lists.length === 0">
+          <div v-if="shoppingListIDs.length === 0">
             You don't have any shopping lists yet!
           </div>
           <div v-else>
@@ -36,15 +36,17 @@ export default {
     return {
       open: false,
       gettingLists: false,
-      lists: [],
-      gotLists: false,
       addingToList: false,
     };
   },
+
   computed: {
     unusedLists() {
       // TODO: only show lists that don't contain this item?
-      return this.lists;
+      //return this.lists;
+      return this.shoppingListIDs.map((id) => {
+        return this.shoppingLists[id]
+      })
 
       // get all shopping_list_items
       // only return the ones that have this recipe_component_id present
@@ -56,25 +58,28 @@ export default {
       } else {
         return 'fa-times-circle'
       }
+    },
+
+    shoppingListIDs() {
+      return this.$store.state.shoppingListIDs
+    },
+    shoppingLists() {
+      return this.$store.state.shoppingLists
     }
   },
+
   methods: {
     getLists() {
       this.open = !this.open;
 
-      if (!this.gotLists) {
-        this.gettingLists = true;
-        axios
-          .get("shoppingList")
-          .then((res) => {
-            this.lists = res.data.shoppingList;
-          })
-          .finally(() => {
-            this.gotLists = true;
-            this.gettingLists = false;
-          });
+      if (this.shoppingListIDs.length === 0) {
+        this.gettingLists = true
+        this.$store.dispatch('getShoppingLists').then(() => {
+          this.gettingLists = false
+        })
       }
     },
+
     addToList(listID) {
       axios
         .post("shoppingListItem", {

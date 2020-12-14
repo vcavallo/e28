@@ -7,7 +7,7 @@
 
     <ul>
       <div v-for="c in components" :key="c.id">
-        <AddToListWidget :componentID="c.id" />
+        <AddToListWidget v-if="user" :componentID="c.id" />
         <RecipeComponent
           :name="c.name"
           :quantity="c.quantity"
@@ -65,6 +65,12 @@ export default {
       adding: false,
     };
   },
+  computed: {
+    user() {
+      return this.$store.state.auth.user
+    }
+  },
+
   watch: {
     recipeID(val) {
       if (val) {
