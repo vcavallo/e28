@@ -55,11 +55,28 @@ export default new Vuex.Store({
             .then((res) => {
               const lists = res.data.shoppingList
               // Fill out shoppingListIDs and shoppingList objects
-              context.state.shoppingListIDs = lists.map((l) => l.id)
-              lists.forEach((l) => context.state.shoppingLists[l.id] = l)
-              resolve()
-            }).catch((err) => {
-              console.log(err)
+              lists.forEach((list) => {
+                list.recipeComponents = []
+                context.state.shoppingListIDs.push(list.id)
+                context.state.shoppingLists[list.id] = list
+              })
+
+              // And then get all the recipe components in this list
+              context.state.shoppingListIDs.forEach((id) => {
+                axios
+                  .get(`shoppingListItem/query?shopping_list_id=${ id }`)
+                  .then((r) => {
+                    r.data.results.forEach((item) => {
+                      context.state.shoppingLists[id].recipeComponents.push(item)
+                    })
+                    resolve()
+                  }).catch((e) => {
+                    console.log(e)
+                    reject()
+                  })
+              })
+            }).catch((e) => {
+              console.log(e)
               reject()
             })
       })

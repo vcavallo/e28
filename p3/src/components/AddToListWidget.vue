@@ -1,5 +1,7 @@
 <template>
   <div style="display: inline-block">
+  <pre>
+  </pre>
     <i @click="getLists" class="fas" :class="toggledIcon" style="padding: 3px"></i>
     <div v-if="open">
       <div class="lists-container">
@@ -8,8 +10,10 @@
           <div v-if="shoppingListIDs.length === 0">
             You don't have any shopping lists yet!
           </div>
+          <div v-else-if="doesntAppearOnLists.length === 0">
+          </div>
           <div v-else>
-            <div v-for="l in unusedLists" :key="l.id">
+            <div v-for="l in doesntAppearOnLists" :key="l.id">
               <span style="margin-right: 8px">
                 <a href="#" @click.prevent="addToList(l.id)"
                   >Add to {{ l.name }}</a
@@ -41,16 +45,27 @@ export default {
   },
 
   computed: {
-    unusedLists() {
-      // TODO: only show lists that don't contain this item?
-      //return this.lists;
-      return this.shoppingListIDs.map((id) => {
-        return this.shoppingLists[id]
-      })
+    doesntAppearOnLists() {
+      const lists = []
 
-      // get all shopping_list_items
-      // only return the ones that have this recipe_component_id present
-      // without more robust database joins and/or Vuex, this will be too costly.
+      if (!this.shoppingLists) {
+        return lists
+      }
+
+      this.shoppingLists.forEach((list) => {
+        // 
+        const presentAndUnacquired = list.recipeComponents.filter((c) => {
+          if (c.id === this.componentID && !c.acquired) {
+            return c
+          }
+        })
+
+        if (presentAndUnacquired.length === 0) {
+          lists.push(list)
+        }
+      })
+      return lists
+
     },
     toggledIcon() {
       if (!this.open) {
@@ -64,7 +79,9 @@ export default {
       return this.$store.state.shoppingListIDs
     },
     shoppingLists() {
-      return this.$store.state.shoppingLists
+      return this.shoppingListIDs.map((id) => {
+        return this.$store.state.shoppingLists[id]
+      })
     }
   },
 

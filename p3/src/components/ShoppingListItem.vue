@@ -13,6 +13,7 @@
         <span v-if="acquired"> [X] </span>
         <span v-else class="checkbox"> [_] </span>
       </div>
+
       <RecipeComponent
         :name="itemName"
         :quantity="itemQuantity"
@@ -30,8 +31,8 @@ export default {
   props: ["id"],
   data() {
     return {
+      item: { acquired: false },
       itemName: "",
-      acquired: "",
       itemQuantity: "",
       itemUnit: "",
       markPending: false,
@@ -43,15 +44,21 @@ export default {
   computed: {
     acquiredStyle() {
       return {
-        gotIt: this.acquired,
+        gotIt: this.item.acquired,
       };
+    },
+    acquired() {
+      if (this.item) {
+        return this.item.acquired
+      }
+      return false
     },
   },
   methods: {
     getListItemDetails() {
       axios.get(`shoppingListItem/${this.id}`).then((res) => {
         const item = res.data.shoppingListItem;
-        this.acquired = res.data.shoppingListItem.acquired;
+        this.item = item
         axios.get(`recipeComponent/${item.recipe_component_id}`).then((res) => {
           this.itemName = res.data.recipeComponent.name;
           this.itemQuantity = res.data.recipeComponent.quantity;
@@ -62,9 +69,13 @@ export default {
     toggleAcquired() {
       this.markPending = true;
       axios
-        .put(`shoppingListItem/${this.id}`, { acquired: !this.acquired })
-        .then(() => {
-          this.acquired = !this.acquired;
+        .put(`shoppingListItem/${this.id}`, {
+          shopping_list_id: this.item.shopping_list_id,
+          recipe_component_id: this.item.recipe_component_id,
+          acquired: !this.item.acquired
+          })
+        .then((res) => {
+          this.item = res.data.shoppingListItem;
         })
         .catch((err) => {
           console.log(err);
