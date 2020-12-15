@@ -1,0 +1,35 @@
+describe('Shopping lists', () => {
+  it("Is only accessible when logged in", () => {
+    cy.visit('/')
+    cy.contains('Shopping Lists').should('not.exist')
+    cy.visit('/account')
+    cy.get("[data-cy='email']").clear().type('vinney@exnil.io')
+    cy.get("[data-cy='password']").clear().type('asdfasdf')
+    cy.get("[data-cy='login-button']").click()
+    cy.contains('Shopping Lists')
+  })
+
+  it("Can add an item to a shopping list", () => {
+    // This test fails because of Laravel rate-limiting due to N+1 queries (would be solved by DB-level join or different data model or removing the rate-limit for the test enviroment)
+    cy.visit('/account')
+    cy.get("[data-cy='email']").clear().type('vinney@exnil.io')
+    cy.get("[data-cy='password']").clear().type('asdfasdf')
+    cy.get("[data-cy='login-button']").click()
+    cy.contains('Hello,')
+
+    cy.visit('/shopping-lists')
+    cy.contains("Breakfast Things")
+    cy.get("[data-cy='listName']").first().click()
+    cy.contains("Egg").should('not.exist')
+
+    cy.visit("/recipes")
+    cy.get("a[href='/recipes/1']").click()
+    cy.contains("Breakfast things").should('not.exist')
+    cy.get("[data-cy='addToList']").first().click()
+    cy.get("[data-cy='listName']").first().click()
+    cy.visit('/shopping-lists')
+    cy.contains("Breakfast Things")
+    cy.get("[data-cy='listName']").first().click()
+    cy.contains("Egg")
+  })
+})

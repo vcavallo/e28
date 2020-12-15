@@ -2,7 +2,7 @@
   <div style="display: inline-block">
   <pre>
   </pre>
-    <i @click="getLists" class="fas" :class="toggledIcon" style="padding: 3px"></i>
+    <i @click="getLists" class="fas" :class="toggledIcon" style="padding: 3px" data-cy="addToList"></i>
     <div v-if="open">
       <div class="lists-container">
         <div v-if="gettingLists">...Finding shopping lists</div>
@@ -15,7 +15,7 @@
           <div v-else>
             <div v-for="l in doesntAppearOnLists" :key="l.id">
               <span style="margin-right: 8px">
-                <a href="#" @click.prevent="addToList(l.id)"
+                <a data-cy="listName" href="#" @click.prevent="addToList(l.id)"
                   >Add to {{ l.name }}</a
                 >
               </span>
@@ -46,25 +46,26 @@ export default {
 
   computed: {
     doesntAppearOnLists() {
-      const lists = []
+      return this.shoppingLists
+      //const lists = []
 
-      if (!this.shoppingLists) {
-        return lists
-      }
+      //if (!this.shoppingLists) {
+        //return lists
+      //}
 
-      this.shoppingLists.forEach((list) => {
-        // 
-        const presentAndUnacquired = list.recipeComponents.filter((c) => {
-          if (c.id === this.componentID && !c.acquired) {
-            return c
-          }
-        })
+      //this.shoppingLists.forEach((list) => {
+        //// 
+        //const presentAndUnacquired = list.recipeComponents.filter((c) => {
+          //if (c.id === this.componentID && !c.acquired) {
+            //return c
+          //}
+        //})
 
-        if (presentAndUnacquired.length === 0) {
-          lists.push(list)
-        }
-      })
-      return lists
+        //if (presentAndUnacquired.length === 0) {
+          //lists.push(list)
+        //}
+      //})
+      //return lists
 
     },
     toggledIcon() {
@@ -91,7 +92,7 @@ export default {
 
       if (this.shoppingListIDs.length === 0) {
         this.gettingLists = true
-        this.$store.dispatch('getShoppingLists').then(() => {
+        this.$store.dispatch('getShoppingLists').finally(() => {
           this.gettingLists = false
         })
       }

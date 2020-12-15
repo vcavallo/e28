@@ -32,20 +32,16 @@ export default new Vuex.Store({
 
   actions: {
     authUser(context) {
-      return new Promise((resolve, reject) => {
-        console.log('going to post')
+      return new Promise((resolve) => {
         axios.post('auth').then((response) => {
-          console.log('success')
           if (response.data.authenticated) {
-            const user = response.data.user
-            context.commit('setUser', user)
+            context.commit('setUser', response.data.user);
+          } else {
+            context.commit('setUser', false);
           }
-          resolve()
-        }).catch(() => {
-          console.log('fail')
-          reject()
-        })
-      })
+          resolve(response);
+        });
+      });
     },
 
     getShoppingLists(context) {

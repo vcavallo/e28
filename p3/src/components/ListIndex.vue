@@ -2,7 +2,7 @@
   <div>
     <ul>
       <li v-for="l in lists" :key="l.id">
-        <router-link :to="{ name: 'listShow', params: { listID: l.id } }">{{ l.name }}</router-link>
+        <router-link data-cy="listName" :to="{ name: 'listShow', params: { listID: l.id } }">{{ l.name }}</router-link>
       </li>
     </ul>
   </div>

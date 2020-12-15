@@ -66,19 +66,23 @@ const router = new VueRouter({
 })
 
 router.beforeEach(async (to, from, next) => {
-  const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
-
-  if (!store.state.auth.user) { // On every route, get a user IF we don't have one.
-    store.dispatch('authUser').then(() => {
+    const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+    const decide = () => {
       if (requiresAuth && !store.state.auth.user) {
         next('/unauthorized');
-      } else {
+      }
+      else {
         next();
       }
-    })
-    next()
-  }
-  next()
+    }
+
+    if (store.state.auth.user === null || !store.state.auth.user) {
+      store.dispatch('authUser').then(() => {
+        decide();
+      });
+    } else {
+      decide();
+    }
 
 });
 

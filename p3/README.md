@@ -4,6 +4,8 @@
 
 refresh endpoint for tests
 
+rate limit in tests
+
 ## Pages summary
 
 The headers below correspond to routes (with dashes omitted for readability)
