@@ -19,15 +19,17 @@
           <div>
             <label for="componentName">
               New ingredient name
-              <input placeholder="Olive Oil" type="text" id="componentName" v-model="newComponentName">
-              <ErrorList :errors="errors" errorKey="name" />
+              <input placeholder="Olive Oil" type="text" id="componentName" v-model="newComponentName" @blur="validation['name']" >
+              <ErrorList :errors="uiErrors" errorKey="name" />
+              <ErrorList :errors="ApiErrors" errorKey="name" />
             </label>
           </div>
           <div>
             <label for="componentQty">
               Quantity
-              <input placeholder="1.5" type="text" id="componentQty" v-model="newComponentQty">
-              <ErrorList :errors="errors" errorKey="quantity" />
+              <input placeholder="1.5" type="text" id="componentQty" v-model="newComponentQty" @blur="validation['quantity']">
+              <ErrorList :errors="uiErrors" errorKey="quantity" />
+              <ErrorList :errors="ApiErrors" errorKey="quantity" />
             </label>
           </div>
           <div>
@@ -54,9 +56,12 @@ import AddToListWidget from "@/components/AddToListWidget.vue"
 
 export default {
   props: ["recipeID"],
+
   created() {
     this.setUpRecipe(this.recipeID);
+    this.validation
   },
+
   data() {
     return {
       recipe: {},
@@ -65,12 +70,37 @@ export default {
       newComponentQty: null,
       newComponentUnit: '',
       adding: false,
-      errors: {},
+      ApiErrors: {},
+      uiErrors: {},
     };
   },
+
   computed: {
     user() {
       return this.$store.state.auth.user
+    },
+
+    validation() {
+      return {
+        name: (val) => {
+          const value = val.target.value
+          if (!value) {
+            this.setUiErrors('name', ["Cannot be blank!"])
+          } else {
+            this.setUiErrors('name', [])
+          }
+        },
+        quantity: (val) => {
+          const value = val.target.value
+          if (!value) {
+            this.setUiErrors('quantity', ["Quantity is required."])
+          } else if (isNaN(value)) {
+            this.setUiErrors('quantity', ["Must be a number."])
+          } else {
+            this.setUiErrors('quantity', [])
+          }
+        },
+      }
     }
   },
 
@@ -80,8 +110,26 @@ export default {
         this.setUpRecipe(val);
       }
     },
+
+    uiErrors(val) {
+      const errors = Object.keys(val).map((k) => {
+        return val[k]
+      })
+      if (errors.flat().length > 0) {
+        this.adding = true
+      } else {
+        this.adding = false
+      }
+    },
   },
+
   methods: {
+    setUiErrors(keyName, errorsArray) {
+      // Need to overwrite the entire object in order to satisfy Vue reactivity quirks
+      const errorObject = Object.assign({}, this.uiErrors)
+      errorObject[keyName] = errorsArray
+      this.uiErrors = errorObject
+    },
     setUpRecipe(rID) {
       this.getRecipe(rID);
       this.getComponentsForRecipe(rID);
@@ -109,7 +157,7 @@ export default {
           const newComponent = res.data.recipeComponent
           this.components.push(newComponent)
         } else {
-          this.errors = res.data.errors
+          this.ApiErrors = res.data.errors
         }
       })
       .finally(() => {
