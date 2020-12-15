@@ -20,12 +20,14 @@
             <label for="componentName">
               New ingredient name
               <input placeholder="Olive Oil" type="text" id="componentName" v-model="newComponentName">
+              <ErrorList :errors="errors" errorKey="name" />
             </label>
           </div>
           <div>
             <label for="componentQty">
               Quantity
               <input placeholder="1.5" type="text" id="componentQty" v-model="newComponentQty">
+              <ErrorList :errors="errors" errorKey="quantity" />
             </label>
           </div>
           <div>
@@ -63,6 +65,7 @@ export default {
       newComponentQty: null,
       newComponentUnit: '',
       adding: false,
+      errors: {},
     };
   },
   computed: {
@@ -105,6 +108,8 @@ export default {
         if (res.data.success) {
           const newComponent = res.data.recipeComponent
           this.components.push(newComponent)
+        } else {
+          this.errors = res.data.errors
         }
       })
       .finally(() => {

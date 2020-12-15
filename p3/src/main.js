@@ -9,6 +9,9 @@ import router from '@/router/router'
 
 Vue.config.productionTip = false
 
+import ErrorList from '@/components/global/ErrorList.vue'
+Vue.component('ErrorList', ErrorList);
+
 new Vue({
   router: router,
   store: store,
