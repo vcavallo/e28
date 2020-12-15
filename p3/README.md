@@ -6,6 +6,9 @@ refresh endpoint for tests
 
 rate limit in tests
 
+on change the validation/errors showuld claer
+only did validate on the recipe ingredient add field
+
 ## Pages summary
 
 The headers below correspond to routes (with dashes omitted for readability)
