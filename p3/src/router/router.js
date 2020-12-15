@@ -13,6 +13,8 @@ import RecipeNew from '@/components/RecipeNew.vue';
 import ListIndex from '@/components/ListIndex.vue';
 import ListShow from '@/components/ListShow.vue';
 
+import DevRefreshSeeds from '@/DevRefreshSeeds.vue'
+
 const routes = [
   {
     path: '/', component: Home, name: 'home',
@@ -52,7 +54,10 @@ const routes = [
   },
   {
     path: '/unauthorized', component: Unauthorized, name: 'unauthorized'
-  }
+  },
+  {
+    path: '/dev/refresh-seeds', component: DevRefreshSeeds
+  },
 ]
 
 const router = new VueRouter({

@@ -9,21 +9,21 @@
   <div v-else>
     <h2>Sign Up</h2>
     <div>
-      <label>Name: <input type="text" v-model="name" /></label>
+      <label>Name: <input data-cy="name" type="text" v-model="name" /></label>
     </div>
     <div>
-      <label>Email: <input type="text" v-model="email" /></label>
+      <label>Email: <input data-cy="email" type="text" v-model="email" /></label>
     </div>
     <div>
-      <label>Password: <input type="password" v-model="password"
+      <label>Password: <input data-cy="password" type="password" v-model="password"
       /></label>
     </div>
     <div>
-      <label >Password Again: <input type="password" v-model="passwordConfirmation"
+      <label >Password Again: <input data-cy="passwordConfirmation" type="password" v-model="passwordConfirmation"
       /></label>
     </div>
 
-    <button @click="signup">Sign Up!</button>
+    <button data-cy="signupButton" @click="signup">Sign Up!</button>
 
     <ul v-if="errors">
       <li class="error" v-for="(error, index) in errors" :key="index">

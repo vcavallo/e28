@@ -3,21 +3,21 @@
 
   <div v-if="user">
     <h2>Hello, {{ user.name }}</h2>
-    <button @click="logout">Logout</button>
+    <button data-cy="logout-button" @click="logout">Logout</button>
   </div>
 
   <div v-else>
     <h2>Login</h2>
     <div>
-      <label>Email: <input type="text" v-model="email" /></label>
+      <label>Email: <input data-cy='email' type="text" v-model="email" /></label>
     </div>
     <div>
       <label
-          >Password: <input type="password" v-model="password"
+          >Password: <input data-cy='password' type="password" v-model="password"
       /></label>
     </div>
 
-    <button @click="login">Login</button>
+    <button data-cy="login-button" @click="login">Login</button>
 
     <ul v-if="errors">
       <li class="error" v-for="(error, index) in errors" :key="index">
@@ -49,7 +49,7 @@ export default {
   methods: {
      login() {
        this.errors = null
-       axios.post('login', {
+       axios.post('/login', {
          email: this.email,
          password: this.password,
        }).then((response) => {
@@ -61,10 +61,9 @@ export default {
        });
      },
      logout() {
-       axios.post('logout').then((response) => {
-         if (response.data.success) {
-           this.$store.commit('setUser', null);
-         }
+       axios.post('/logout').finally(() => {
+         this.$store.commit('setUser', null);
+         this.$router.push('/')
        });
      },
    },

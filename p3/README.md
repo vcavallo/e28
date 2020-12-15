@@ -2,6 +2,8 @@
 + By: Vinney Cavallo
 + Production URL: <http://recipes.vinney.xyz>
 
+refresh endpoint for tests
+
 ## Pages summary
 
 The headers below correspond to routes (with dashes omitted for readability)
